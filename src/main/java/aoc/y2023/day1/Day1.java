@@ -1,15 +1,15 @@
-package src.main.java.aoc.y2023.day1;
+package main.java.aoc.y2023.day1;
+
+import main.java.aoc.y2023.utils.Utils;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static src.main.java.aoc.y2023.utils.Utils.readAllLinesFromStream;
-
 public class Day1 {
 
     public static void main(String[] args) throws URISyntaxException {
-        List<String> inputList = readAllLinesFromStream(Day1.class.getResource("input1.txt").toURI());
+        List<String> inputList = Utils.readAllLinesFromStream(Day1.class.getResource("input1.txt").toURI());
 
         List<Integer> calories = new ArrayList<>();
 

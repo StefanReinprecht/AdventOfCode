@@ -1,9 +1,9 @@
-package src.main.java.aoc.y2023.day2;
+package main.java.aoc.y2023.day2;
 
 import java.net.URISyntaxException;
 import java.util.List;
 
-import static src.main.java.aoc.y2023.utils.Utils.readAllLinesFromStream;
+import static main.java.aoc.y2023.utils.Utils.readAllLinesFromStream;
 
 public class Day2 {
 

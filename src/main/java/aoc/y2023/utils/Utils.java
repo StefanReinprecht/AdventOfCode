@@ -1,4 +1,4 @@
-package src.main.java.aoc.y2023.utils;
+package main.java.aoc.y2023.utils;
 
 import java.io.IOException;
 import java.net.URI;
