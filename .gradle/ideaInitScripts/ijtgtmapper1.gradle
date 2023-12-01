@@ -1,0 +1,13 @@
+ext.pathMapper = [:]
+ext.pathMapper.put('C:/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/plugins/android/lib/android-gradle-tooling.jar', '/mnt/c/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/plugins/android/lib/android-gradle-tooling.jar')
+ext.pathMapper.put('C:/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/lib/util-8.jar', '/mnt/c/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/lib/util-8.jar')
+ext.pathMapper.put('C:/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/lib/external-system-rt.jar', '/mnt/c/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/lib/external-system-rt.jar')
+ext.pathMapper.put('C:/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/plugins/android/lib/android-kotlin-extensions-tooling.jar', '/mnt/c/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/plugins/android/lib/android-kotlin-extensions-tooling.jar')
+ext.pathMapper.put('C:/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/plugins/gradle/lib/gradle-api-impldep-8.2.jar', '/mnt/c/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/plugins/gradle/lib/gradle-api-impldep-8.2.jar')
+ext.pathMapper.put('C:/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/plugins/gradle/lib/gradle-tooling-extension-impl.jar', '/mnt/c/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/plugins/gradle/lib/gradle-tooling-extension-impl.jar')
+ext.pathMapper.put('C:/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/lib/util_rt.jar', '/mnt/c/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/lib/util_rt.jar')
+ext.pathMapper.put('C:/Users/stefan/AppData/Roaming/JetBrains/IdeaIC2023.2/plugins/packageSearch/lib/pkgs-tooling-extension.jar', '/mnt/c/Users/stefan/AppData/Roaming/JetBrains/IdeaIC2023.2/plugins/packageSearch/lib/pkgs-tooling-extension.jar')
+ext.pathMapper.put('C:/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/plugins/gradle/lib/gradle-tooling-extension-api.jar', '/mnt/c/Program Files/JetBrains/IntelliJ IDEA Community Edition 2023.1.3/plugins/gradle/lib/gradle-tooling-extension-api.jar')
+ext.pathMapper.put('C:/Users/stefan/AppData/Roaming/JetBrains/IdeaIC2023.2/plugins/Kotlin/lib/kotlin-gradle-tooling.jar', '/mnt/c/Users/stefan/AppData/Roaming/JetBrains/IdeaIC2023.2/plugins/Kotlin/lib/kotlin-gradle-tooling.jar')
+ext.pathMapper.put("<<target java executable path>>", '/home/resmeister/.sdkman/candidates/java/21-tem/bin/java')
+ext.mapPath = { path -> pathMapper.get(path) ?: path }
