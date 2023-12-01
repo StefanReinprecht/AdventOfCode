@@ -2,7 +2,6 @@ package aoc.year2023.day1;
 
 import aoc.utils.Utils;
 
-import java.net.URISyntaxException;
 import java.util.List;
 
 public class Day1 {
