@@ -15,6 +15,7 @@ public class Day3 {
     public static void main(String[] args) {
         List<String> inputList = Utils.readAllLinesFromResourceAsStream(2023, "input3.txt");
 
+        long start = System.currentTimeMillis();
         List<List<String>> parts = new ArrayList<>();
         for (String line : inputList) {
             String[] p = line.split("");
@@ -87,6 +88,9 @@ public class Day3 {
 
         int gearSum = gearRatios.stream().mapToInt(Integer::intValue).sum();
         System.out.println("Answer2: " + gearSum);
+
+        long end = System.currentTimeMillis();
+        System.out.println(end -start);
     }
 
     public static Integer getGearNumber(List<List<String>> parts, int x, int y) {
