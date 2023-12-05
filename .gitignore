@@ -35,3 +35,6 @@ bin/
 ### Gradle ###
 .gradle/
 build
+
+### AOC Input files ###
+src/main/resources/**/*.txt
