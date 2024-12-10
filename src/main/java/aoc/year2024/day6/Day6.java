@@ -8,8 +8,9 @@ import org.javatuples.Pair;
 
 public class Day6 {
 
+  // I'm not proud but it does its job
   public static void main(String[] args) {
-    List<String> inputList = Utils.readAllLinesFromResourceAsStream(2024, "input6_example.txt");
+    List<String> inputList = Utils.readAllLinesFromResourceAsStream(2024, "day6_input.txt");
 
     Pos[][] positions = new Pos[inputList.size()][inputList.getFirst().length()]; {};
 
@@ -134,9 +135,17 @@ public class Day6 {
 
     System.out.println("Part 1: " + totallyVisitedFields + " in " + (System.currentTimeMillis() - startPart1) + " ms");
 
+    part2(allVisitedLocations, positions, originalStartPosX, originalStartPosY, inputList);
+  }
+
+  private static void part2(List<Pair<Integer, Integer>> allVisitedLocations, Pos[][] positions, int originalStartPosX, int originalStartPosY, List<String> inputList) {
+    int currentX;
+    char nextDirection;
+    int currentY;
     // Part 2
     long startPart2 = System.currentTimeMillis();
     int possibleLoopCausingCounter = 0;
+
     for (int i = 0; i < allVisitedLocations.size(); i++) {
       // clear
       for (int y = 0; y < positions[0].length; y++) {
@@ -169,14 +178,8 @@ public class Day6 {
             break;
           }
           Pos nextPos = positions[currentX][currentY - 1];
-          if (nextPos.isVisitedVertical()) {
+          if (nextPos.visitedFromBottom) {
               possibleLoopCausingCounter++;
-            if (currentX == originalStartPosX && currentY - 1 == originalStartPosY) {
-              System.out.println("Loop found " + currentX + " " + currentY);
-            } else {
-              System.out.println("Dead end found " + currentX + " " + currentY);
-            }
-            printGrid(positions, allVisitedLocations.get(i));
             break;
           } else if (nextPos.isObstacle()) {
             // next move is not possible change direction
@@ -184,7 +187,7 @@ public class Day6 {
           } else {
             // move to next direction
             currentY = currentY - 1;
-            nextPos.setVisitedVertical();
+            nextPos.visitedFromBottom = true;
           }
         } else if (nextDirection == 'E') {
           // check if moving to next position is possible
@@ -193,14 +196,8 @@ public class Day6 {
             break;
           }
           Pos nextPos = positions[currentX + 1][currentY];
-          if (nextPos.isVisitedHorizontal()) {
+          if (nextPos.visitedFromLeft) {
               possibleLoopCausingCounter++;
-            if (currentX + 1 == originalStartPosX && currentY == originalStartPosY) {
-              System.out.println("Loop found " + currentX + " " + currentY);
-            } else {
-              System.out.println("Dead end found " + currentX + " " + currentY);
-            }
-            printGrid(positions, allVisitedLocations.get(i));
             break;
           } else if (nextPos.isObstacle()) {
             // next move is not possible change direction
@@ -208,7 +205,7 @@ public class Day6 {
           } else {
             // move to next direction
             currentX = currentX + 1;
-            nextPos.setVisitedHorizontal();
+            nextPos.visitedFromLeft = true;
           }
         } else if (nextDirection == 'S') {
           // check if moving to next position is possible
@@ -217,14 +214,8 @@ public class Day6 {
             break;
           }
           Pos nextPos = positions[currentX][currentY + 1];
-          if (nextPos.isVisitedVertical()) {
+          if (nextPos.visitedFromTop) {
               possibleLoopCausingCounter++;
-            if (currentX == originalStartPosX && currentY + 1 == originalStartPosY) {
-              System.out.println("Loop found " + currentX + " " + currentY);
-            } else {
-              System.out.println("Dead end found " + currentX + " " + currentY);
-            }
-            printGrid(positions, allVisitedLocations.get(i));
             break;
           } else if (nextPos.isObstacle()) {
             // next move is not possible change direction
@@ -232,7 +223,7 @@ public class Day6 {
           } else {
             // move to next direction
             currentY = currentY + 1;
-            nextPos.setVisitedVertical();
+            nextPos.visitedFromTop = true;
           }
         } else {
           // check if moving to next position is possible
@@ -241,14 +232,8 @@ public class Day6 {
             break;
           }
           Pos nextPos = positions[currentX - 1][currentY];
-          if (nextPos.isVisitedHorizontal()) {
+          if (nextPos.visitedFromRight) {
               possibleLoopCausingCounter++;
-            if (currentX - 1 == originalStartPosX && currentY == originalStartPosY) {
-              System.out.println("Loop found " + currentX + " " + currentY);
-            } else {
-              System.out.println("Dead end found " + currentX + " " + currentY);
-            }
-            printGrid(positions, allVisitedLocations.get(i));
             break;
           } else if (nextPos.isObstacle()) {
             // next move is not possible change direction
@@ -256,12 +241,11 @@ public class Day6 {
           } else {
             // move to next direction
             currentX = currentX - 1;
-            nextPos.setVisitedHorizontal();
+            nextPos.visitedFromRight = true;
           }
         }
       }
     }
-
     System.out.println("Part 2: " + possibleLoopCausingCounter + " in " + (System.currentTimeMillis() - startPart2) + " ms");
   }
 
@@ -289,6 +273,10 @@ public class Day6 {
     private boolean obstacle;
     private boolean visitedHorizontal;
     private boolean visitedVertical;
+    private boolean visitedFromBottom;
+    private boolean visitedFromLeft;
+    private boolean visitedFromTop;
+    private boolean visitedFromRight;
 
     public Pos(boolean obstacle) {
       this.obstacle = obstacle;
@@ -321,6 +309,10 @@ public class Day6 {
     public void clear() {
       visitedHorizontal = false;
       visitedVertical = false;
+      visitedFromTop = false;
+      visitedFromRight = false;
+      visitedFromBottom = false;
+      visitedFromLeft = false;
     }
   }
 }
