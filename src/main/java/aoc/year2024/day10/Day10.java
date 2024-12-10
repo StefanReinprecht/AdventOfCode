@@ -1,7 +1,9 @@
 package aoc.year2024.day10;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import aoc.utils.Utils;
 
@@ -13,25 +15,25 @@ public class Day10 {
     long startPart1 = System.currentTimeMillis();
     Coord[][] coords = buildGrid(inputList);
 
-    System.out.println(coords.length);
-
     List<Coord> trailheads = findTrailheads(coords);
 
     long totalScore = 0;
+    long totalRating = 0;
     for (Coord trailhead : trailheads) {
-      List<Coord> endpoints = new ArrayList<>();
+      Map<Coord, Integer> endpoints = new HashMap<>();
       findRoute(trailhead, coords, endpoints);
-      long uniqueEndpoints = endpoints.stream().distinct().count();
-      //System.out.println("Score for trailhead " + trailhead + ": " + uniqueEndpoints);
+      long uniqueEndpoints = endpoints.keySet().size();
       totalScore += uniqueEndpoints;
+      long rating = endpoints.values().stream().mapToInt(Integer::intValue).sum();
+      totalRating += rating;
     }
 
-    System.out.println("Part 1: " + totalScore + " in " + (System.currentTimeMillis() - startPart1) + " ms");
+    System.out.println("Part 1: " + totalScore + ", Part 2: " + totalRating + " in " + (System.currentTimeMillis() - startPart1) + " ns");
   }
 
-  private static void findRoute(Coord trailhead, Coord[][] coords, List<Coord> endpoints) {
+  private static void findRoute(Coord trailhead, Coord[][] coords, Map<Coord, Integer> endpoints) {
     if (trailhead.level == 9) {
-      endpoints.add(trailhead);
+      endpoints.merge(trailhead, 1, Integer::sum);
       return;
     }
 
