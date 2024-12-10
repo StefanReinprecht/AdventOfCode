@@ -3,129 +3,87 @@ package aoc.year2024.day9;
 import aoc.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Day9 {
 
     public static void main(String[] args) {
-        List<String> inputList = Utils.readAllLinesFromResourceAsStream(2024, "day9_example.txt");
+        List<String> inputList = Utils.readAllLinesFromResourceAsStream(2024, "day9_input.txt");
 
-        // parse input
-        List<File> files = new ArrayList<>();
-        String[] compactFiles = inputList.getFirst().split("");
-        boolean isFile = true;
-        int idCounter = 0;
-        for(String file : compactFiles) {
-            int fileLength = Integer.parseInt(file);
-            if (isFile) {
-                files.add(new File(idCounter, fileLength));
-                idCounter++;
-            } else {
-                if (fileLength != 0) {
-                    files.add(new File(true, fileLength));
-                }
-            }
-            isFile = !isFile;
-        }
+        long startPart1 = System.currentTimeMillis();
+        List<Block> blocks = parseInput(inputList);
 
-        System.out.println(files.size());
+        replaceBlocks(blocks); // <- slow
 
-        String wholeLine = files.stream().map(File::toString).collect(Collectors.joining());
-
-        List<File> reversedFilesList = files.reversed();
-        ListIterator<File> fileListIterator = files.listIterator();
-        boolean usePrevious = false;
-        while(fileListIterator.hasNext()) {
-            File currentFile;
-            if (usePrevious) {
-                currentFile = fileListIterator.previous();
-                usePrevious = false;
-            } else {
-                currentFile = fileListIterator.next();
-            }
-
-            if (currentFile.isDefragged) {
-                break;
-            } else if (currentFile.isFreeSpace) {
-                Optional<File> nextToMove = reversedFilesList.stream().filter(file -> !file.isFreeSpace && !file.isDefragged).findFirst();
-                if (nextToMove.isPresent()) {
-                    File nextToMoveFile = nextToMove.get();
-                    if (currentFile.length > nextToMoveFile.length) {
-                        // split block
-                        currentFile.id = nextToMoveFile.id;
-                        nextToMoveFile.isDefragged = true;
-                        nextToMoveFile.isFreeSpace = true;
-                        fileListIterator.add(new File(true, currentFile.length - nextToMoveFile.length));
-                        usePrevious = true;
-                        currentFile.length = nextToMoveFile.length;
-                    } else if (currentFile.length < nextToMoveFile.length) {
-                        currentFile.id = nextToMoveFile.id;
-                        nextToMoveFile.length = nextToMoveFile.length - currentFile.length;
-                    } else {
-                        // move last block and set defragged
-                        currentFile.id = nextToMoveFile.id;
-                        nextToMoveFile.isDefragged = true;
-                        nextToMoveFile.isFreeSpace = true;
-                    }
-                    currentFile.isFreeSpace = false;
-                } else {
-                    break;
-                }
-
-            } else {
-                currentFile.isDefragged = true;
-            }
-            wholeLine = files.stream().map(File::toString).collect(Collectors.joining());
-            System.out.println(wholeLine);
-        }
-
-        int hashedSum = 0;
-        String[] split = wholeLine.split("");
-        for (int i = 0; i < split.length; i++) {
-            if (split[i].equals(".")) {
-                continue;
-            }
-            hashedSum += Integer.parseInt(split[i]) * i;
-        }
-
-        System.out.println(wholeLine);
-        // 009981118872766333545554 my result
-        // 0099811188827773336446555566 expected result
-        // 009981118882777333644655556
-        // 00998111888277733364465555666777.88899
-        // 00998111888277733364465555.66.......99
-
-        System.out.println("Result 1: " + hashedSum);
+        long hashCode = getHashCode(blocks);
+        System.out.println("Part 1: " + hashCode + " in " + (System.currentTimeMillis() - startPart1));
     }
 
-    public static class File {
+    private static long getHashCode(List<Block> blocks) {
+        long hash = 0;
+        for (int i = 0; i < blocks.size(); i++) {
+            Block block = blocks.get(i);
+            if (block.isFreeSpace) {
+                break;
+            }
+            hash += (long) block.id * i;
+        }
+        return hash;
+    }
+
+    private static void replaceBlocks(List<Block> blocks) {
+        List<Block> reversedBlocks = blocks.reversed();
+        for (int i = 0; i < reversedBlocks.size(); i++) {
+            Block currentBlock = reversedBlocks.get(i);
+            if (!currentBlock.isFreeSpace) {
+                int indexOfFirstFreeBlock = getIndexOfFirstFreeBlock(blocks, blocks.size() - i);
+                if (indexOfFirstFreeBlock == -1) {
+                    break;
+                }
+                Collections.swap(blocks, indexOfFirstFreeBlock, blocks.size() - (i + 1));
+            }
+        }
+    }
+
+    private static int getIndexOfFirstFreeBlock(List<Block> blocks, int maxIndex) {
+        for (int i = 0; i < maxIndex; i++) {
+            if (blocks.get(i).toString().equals(".")) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static List<Block> parseInput(List<String> input) {
+        List<Block> blocks = new ArrayList<>();
+        String[] blocksAsCompactedString = input.getFirst().split("");
+        for (int i = 0; i < blocksAsCompactedString.length; i++) {
+            Block currentBlock = new Block();
+            if (i % 2 == 0) {
+                // file block
+                currentBlock.id = i / 2;
+            } else {
+                // free space block
+                currentBlock.isFreeSpace = true;
+            }
+            IntStream.range(0, Integer.parseInt(blocksAsCompactedString[i])).forEach(a -> blocks.add(currentBlock));
+        }
+        return blocks;
+    }
+
+    public static class Block {
         boolean isFreeSpace;
         int id;
-        int length;
-        boolean isDefragged;
-
-        public File(boolean isFreeSpace, int length) {
-            this.isFreeSpace = isFreeSpace;
-            this.length = length;
-        }
-
-        public File(int id, int length) {
-            this.id = id;
-            this.length = length;
-        }
 
         @Override
         public String toString() {
-            if (isFreeSpace ) {
-                return ".".repeat(length);
-            } else if (isDefragged) {
-                return new String(id + "").repeat(length);
-                //return "D".repeat(length);
+            if (isFreeSpace) {
+                return ".";
+            } else {
+                return id + "";
             }
-            return new String(id + "").repeat(length);
         }
     }
 }
