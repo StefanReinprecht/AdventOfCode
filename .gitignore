@@ -41,3 +41,6 @@ target/
 
 ### AOC Input files ###
 src/main/resources/**/*.txt
+
+### GIT ###
+.gitconfig
