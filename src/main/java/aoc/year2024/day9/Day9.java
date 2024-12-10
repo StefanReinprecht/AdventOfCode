@@ -35,10 +35,11 @@ public class Day9 {
 
     private static void replaceBlocks(List<Block> blocks) {
         List<Block> reversedBlocks = blocks.reversed();
+        int indexOfFirstFreeBlock = 0;
         for (int i = 0; i < reversedBlocks.size(); i++) {
             Block currentBlock = reversedBlocks.get(i);
             if (!currentBlock.isFreeSpace) {
-                int indexOfFirstFreeBlock = getIndexOfFirstFreeBlock(blocks, blocks.size() - i);
+                indexOfFirstFreeBlock = getIndexOfFirstFreeBlock(blocks, indexOfFirstFreeBlock, blocks.size() - i);
                 if (indexOfFirstFreeBlock == -1) {
                     break;
                 }
@@ -47,10 +48,10 @@ public class Day9 {
         }
     }
 
-    private static int getIndexOfFirstFreeBlock(List<Block> blocks, int maxIndex) {
-        for (int i = 0; i < maxIndex; i++) {
-            if (blocks.get(i).toString().equals(".")) {
-                return i;
+    private static int getIndexOfFirstFreeBlock(List<Block> blocks, int lastFirstIndex, int maxIndex) {
+        for (; lastFirstIndex < maxIndex; lastFirstIndex++) {
+            if (blocks.get(lastFirstIndex).isFreeSpace) {
+                return lastFirstIndex;
             }
         }
         return -1;
@@ -76,14 +77,5 @@ public class Day9 {
     public static class Block {
         boolean isFreeSpace;
         int id;
-
-        @Override
-        public String toString() {
-            if (isFreeSpace) {
-                return ".";
-            } else {
-                return id + "";
-            }
-        }
     }
 }
