@@ -1,13 +1,6 @@
 package aoc.year2024.day16;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 import aoc.utils.Utils;
 
@@ -25,28 +18,32 @@ public class Day16 {
     printResult(inputList, route.getFirst());
     System.out.println("Part 1: " + part1Result + " in " + (System.currentTimeMillis() - startPart1) + "ms");
     // 143572 too high
+    // 143571 too high
   }
 
   private static void printResult(List<String> inputList, List<ReindeerPos> route) {
     String[][] grid = new String[inputList.size()][inputList.getFirst().length()];
 
-    for (int i = 0; i < inputList.size(); i++) {
-      String[] split = inputList.get(i).split("");
-      for (int j = 0; j < split.length; j++) {
-        grid[i][j] = split[j];
+    for (int row = 0; row < inputList.size(); row++) {
+      String[] cols = inputList.get(row).split("");
+      for (int col = 0; col < cols.length; col++) {
+        grid[row][col] = cols[col];
       }
     }
 
-    for (int y = 0; y < grid[0].length; y++) {
-      for (int x = 0; x < grid.length; x++) {
+
+    for (int y = 0; y < grid.length; y++) {
+      for (int x = 0; x < grid[0].length; x++) {
         int finalX = x;
         int finalY = y;
-        if (grid[x][y].equals("S") || grid[x][y].equals("E")) {
-          System.out.println(grid[x][y]);
+        Optional<ReindeerPos> first = route.stream().filter(reindeerPos -> reindeerPos.pos.x == finalX && reindeerPos.pos.y == finalY).findFirst();
+        if (grid[y][x].equals("S") || grid[y][x].equals("E")) {
+          System.out.print(grid[y][x]);
         } else if (route.stream().anyMatch(reindeerPos -> reindeerPos.pos.x == finalX && reindeerPos.pos.y == finalY)) {
-          System.out.print("X");
+          System.out.print(first.get().direction);
+          //System.out.print("X");
         } else {
-          System.out.print(grid[x][y]);
+          System.out.print(grid[y][x]);
         }
       }
       System.out.println();
@@ -56,7 +53,7 @@ public class Day16 {
   public static List<List<ReindeerPos>> findRoute(ReindeerPos from, ReindeerPos to, Map<Pos, ReindeerPos> grid) {
     List<List<ReindeerPos>> routes = new ArrayList<>();
 
-    Map<ReindeerPos, ReindeerPos> allPos = new HashMap<>();
+    Map<ReindeerPos, ReindeerPos> processedLocations = new HashMap<>();
     Queue<ReindeerPos> queue = new PriorityQueue<>();
 
     queue.add(from);
@@ -78,16 +75,33 @@ public class Day16 {
       List<ReindeerPos> neighbors = getNeighbors(next, grid);
       neighbors.forEach(
           neighbor -> {
-            allPos.put(neighbor, next);
+            if (next.isLocationAlreadyOnRoute(neighbor)) {
+              return;
+            }
+
             int nextNodeScore = 1 + (neighbor.direction.equals(next.direction) ? 0 : 1000);
+
             if (neighbor.totalScore > nextNodeScore + next.totalScore) {
               neighbor.totalScore = nextNodeScore + next.totalScore;
               neighbor.previous = next;
+
+              if (queue.contains(neighbor)) {
+                System.out.println("Queue contains neighbor");
+              }
+
+              if (processedLocations.containsKey(neighbor)) {
+                ReindeerPos alreadyProcessedPos = processedLocations.get(neighbor);
+                if (alreadyProcessedPos.totalScore < neighbor.totalScore) {
+                  return;
+                }
+              }
+
               queue.add(neighbor);
             }
           }
       );
 
+      processedLocations.put(next, next);
     }
 
     return routes;
@@ -165,7 +179,13 @@ public class Day16 {
     return grid;
   }
 
-  public record Pos(int x, int y) {}
+  public record Pos(int x, int y) {
+    @Override
+    public boolean equals(Object obj) {
+      Pos o = (Pos) obj;
+      return x == o.x && y == o.y;
+    }
+  }
 
   public static class ReindeerPos implements Comparable<ReindeerPos> {
 
@@ -189,6 +209,18 @@ public class Day16 {
     public boolean equals(Object obj) {
       ReindeerPos o = (ReindeerPos) obj;
       return Objects.equals(this.pos, o.pos);
+    }
+
+    public boolean isLocationAlreadyOnRoute(ReindeerPos rp) {
+      List<ReindeerPos> route = new ArrayList<>();
+
+      ReindeerPos c = previous;
+      while(c != null) {
+        route.add(c);
+        c = c.previous;
+      }
+
+      return route.contains(rp);
     }
   }
 }
