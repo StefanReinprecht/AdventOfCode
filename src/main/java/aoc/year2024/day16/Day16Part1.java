@@ -4,21 +4,19 @@ import aoc.utils.Utils;
 
 import java.util.*;
 
-public class Day16V2 {
+public class Day16Part1 {
 
     public static void main(String[] args) {
-        List<String> inputList = Utils.readAllLinesFromResourceAsStream(2024, "day16_example4.txt");
+        List<String> inputList = Utils.readAllLinesFromResourceAsStream(2024, "day16_input.txt");
 
         Map<Direction, Pos>[][] grid = parseGrid(inputList);
         Pos startPos = findStartPos(grid);
         List<Pos> endPos = findEndPos(grid);
 
-        Pos endPosWithPath = findPath(grid, startPos, endPos);
-//        System.out.println(endPosWithPath.getPath());
-        //printGrid(grid, endPosWithPath.getPath());
+        findPath(grid, startPos, endPos);
     }
 
-    private static Pos findPath(Map<Direction, Pos>[][] grid, Pos startPos, List<Pos> endPos) {
+    private static void findPath(Map<Direction, Pos>[][] grid, Pos startPos, List<Pos> endPos) {
         startPos.score = 0;
 
         Queue<Pos> queue = new PriorityQueue<>();
@@ -28,30 +26,23 @@ public class Day16V2 {
         while(!queue.isEmpty()) {
             Pos current = queue.poll();
 
-            if (current.equals(endPos)) {
-                System.out.println("Found destination");
-                System.out.println("Score: " + current.score);
-                return current;
+            if (endPos.contains(current)) {
+                System.out.println("Part 1: " + current.score);
+                return;
             }
 
-            Map<String, Pos> neighbours = getNeighbours(grid, current);
-            for (Map.Entry<String, Pos> neighbourEntry : neighbours.entrySet()) {
-                String direction = neighbourEntry.getKey();
-                Pos neighbour = neighbourEntry.getValue();
+            List<Pos> neighbours = getNeighbours(grid, current);
+            for (Pos neighbour : neighbours) {
                 if(!isValidPathPos(neighbour) || neighbour.equals(current.previous) || currentPathContainsPos(current, neighbour)) {
                     continue;
                 }
 
-                boolean rotation = neighbourAccessNeedsRotation(current, direction);
-                int nextScore = 1 + (rotation ? 1000 : 0);
+                boolean rotation = neighbourAccessNeedsRotation(current, neighbour);
+                int nextScore = (rotation ? 0 : 1) + (rotation ? 1000 : 0);
 
                 if (neighbour.score > current.score + nextScore) {
                     neighbour.score = current.score + nextScore;
                     neighbour.previous = current;
-
-                    if (rotation) {
-                        current.score += 1000;
-                    }
 
                     queue.add(neighbour);
                 }
@@ -71,46 +62,35 @@ public class Day16V2 {
             } catch (ArrayIndexOutOfBoundsException ignore) {}
         }
 
-        try {
-            neighbours.put("S", grid[current.y + 1][current.x]);
-        } catch (Exception ignored) {}
+        if (current.direction == Direction.EAST) {
+            neighbours.add(grid[current.y][current.x].get(Direction.NORTH));
+            neighbours.add(grid[current.y][current.x].get(Direction.SOUTH));
+            try {
+                neighbours.add(grid[current.y][current.x + 1].get(Direction.EAST));
+            } catch (ArrayIndexOutOfBoundsException ignore) {}
+        }
 
-        try {
-            neighbours.put("E", grid[current.y][current.x + 1]);
-        } catch (Exception ignored) {}
+        if (current.direction == Direction.SOUTH) {
+            neighbours.add(grid[current.y][current.x].get(Direction.EAST));
+            neighbours.add(grid[current.y][current.x].get(Direction.WEST));
+            try {
+                neighbours.add(grid[current.y + 1][current.x].get(Direction.SOUTH));
+            } catch (ArrayIndexOutOfBoundsException ignore) {}
+        }
 
-        try {
-            neighbours.put("N", grid[current.y - 1][current.x]);
-        } catch (Exception ignored) {}
-
-        try {
-            neighbours.put("W", grid[current.y][current.x - 1]);
-        } catch (Exception ignored) {}
+        if (current.direction == Direction.WEST) {
+            neighbours.add(grid[current.y][current.x].get(Direction.SOUTH));
+            neighbours.add(grid[current.y][current.x].get(Direction.NORTH));
+            try {
+                neighbours.add(grid[current.y][current.x - 1].get(Direction.WEST));
+            } catch (ArrayIndexOutOfBoundsException ignore) {}
+        }
 
         return neighbours;
     }
 
-    private static boolean neighbourAccessNeedsRotation(Pos current, String neighbourDirection) {
-        // start pos, its direction is east
-        if (current.previous == null) {
-            return !neighbourDirection.equals("E");
-        }
-
-        Pos previous = current.previous;
-
-        if (previous.x + 1 == current.x && previous.y == current.y) {
-            // current direction is east
-            return !neighbourDirection.equals("E");
-        } else if (previous.x - 1 == current.x && previous.y == current.y) {
-            // current direction is west
-            return !neighbourDirection.equals("W");
-        } else if (previous.x == current.x && previous.y - 1 == current.y) {
-            // current direction is north
-            return !neighbourDirection.equals("N");
-        } else {
-            // current direction is south
-            return !neighbourDirection.equals("S");
-        }
+    private static boolean neighbourAccessNeedsRotation(Pos current, Pos neighbour) {
+        return current.x == neighbour.x && current.y == neighbour.y && current.direction != neighbour.direction;
     }
 
     private static boolean isValidPathPos(Pos neighbour) {
@@ -169,21 +149,6 @@ public class Day16V2 {
         return grid;
     }
 
-    private static void printGrid(Pos[][] grid, List<Pos> path) {
-        for (Pos[] pos : grid) {
-            for (Pos po : pos) {
-                if (po.type.equals("#")) {
-                    System.out.print("#");
-                } else if (path.contains(po)) {
-                    System.out.print("X");
-                } else {
-                    System.out.print(".");
-                }
-            }
-            System.out.println();
-        }
-    }
-
     public static class Pos implements Comparable<Pos> {
         int x;
         int y;
@@ -230,6 +195,6 @@ public class Day16V2 {
     }
 
     public enum Direction {
-        NORTH, EAST, SOUTH, WEST;
+        NORTH, EAST, SOUTH, WEST
     }
 }
