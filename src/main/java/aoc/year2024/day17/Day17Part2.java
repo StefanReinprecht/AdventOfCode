@@ -16,7 +16,7 @@ public class Day17Part2 {
      * 1,1 => b = b ^ 1
      * 7,5 => c = a / 2 ^ b
      * 1,5 => b = b ^ 5
-     * 0,3 => a = a / 8
+     * 0,3 => a = a / 8 (when reverse engineering the instructions, this part goes to the top and reverses to a multiplication)
      * 4,4 => b ^ c
      * 5,5 => prints b % 8
      * 3,0 => jump to 0 until a == 0
